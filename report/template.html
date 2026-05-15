@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ACROPROBE Forensic Report — {{ meta.case_id }}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #1a1a2e; }
+
+    .header {
+      background: linear-gradient(135deg, #1B3A6B, #0d2347);
+      color: white;
+      padding: 36px 48px;
+      border-bottom: 4px solid #e63946;
+    }
+    .header h1 { font-size: 28px; letter-spacing: 3px; margin-bottom: 6px; }
+    .header .subtitle { font-size: 13px; opacity: 0.7; letter-spacing: 1px; }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 28px 48px;
+      background: white;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .meta-item label { font-size: 11px; text-transform: uppercase; color: #888; letter-spacing: 1px; }
+    .meta-item span  { display: block; font-size: 15px; font-weight: 600; color: #1B3A6B; margin-top: 4px; }
+
+    .integrity-box {
+      margin: 0 48px 24px;
+      padding: 14px 20px;
+      background: #eaf4ff;
+      border-left: 4px solid #1B3A6B;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+      color: #1B3A6B;
+      margin-top: 24px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 0 48px 28px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px 24px;
+      text-align: center;
+      border-top: 4px solid #1B3A6B;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .stat-card .number { font-size: 36px; font-weight: 700; color: #1B3A6B; }
+    .stat-card .label  { font-size: 12px; color: #888; text-transform: uppercase; margin-top: 4px; }
+    .stat-card.danger  { border-color: #e63946; }
+    .stat-card.danger .number { color: #e63946; }
+
+    .section { padding: 0 48px 36px; }
+    .section h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #1B3A6B;
+      border-bottom: 2px solid #1B3A6B;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+    }
+
+    .host-card {
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .host-card .host-header {
+      background: #1B3A6B;
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .host-card .host-header .ip   { font-size: 16px; font-weight: 700; font-family: monospace; }
+    .host-card .host-header .meta { font-size: 12px; opacity: 0.75; }
+    .host-body { padding: 16px 20px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+    th { background: #f0f4ff; color: #1B3A6B; text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase; }
+    td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; font-family: monospace; }
+    tr:last-child td { border: none; }
+
+    .flag-list { margin-top: 12px; }
+    .flag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin: 4px 4px 4px 0;
+      font-weight: 600;
+    }
+    .flag.CRITICAL { background: #fde8ea; color: #c0392b; border: 1px solid #e74c3c; }
+    .flag.HIGH     { background: #fef3e2; color: #d35400; border: 1px solid #e67e22; }
+    .flag.MEDIUM   { background: #fef9e2; color: #b7950b; border: 1px solid #f1c40f; }
+    .flag.LOW      { background: #eafaf1; color: #1e8449; border: 1px solid #2ecc71; }
+
+    .topology-section { padding: 0 48px 36px; }
+    .topology-section h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #1B3A6B;
+      border-bottom: 2px solid #1B3A6B;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+    }
+
+    .footer {
+      background: #1B3A6B;
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      font-family: monospace;
+      margin-top: 20px;
+    }
+    .footer .hash { color: rgba(255,255,255,0.9); margin-top: 6px; word-break: break-all; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>⬡ ACROPROBE FORENSIC REPORT</h1>
+    <div class="subtitle">Network Reconnaissance & Threat Mapping | Acro Tool Suite</div>
+  </div>
+
+  <!-- META -->
+  <div class="meta-grid">
+    <div class="meta-item"><label>Case ID</label><span>{{ meta.case_id }}</span></div>
+    <div class="meta-item"><label>Examiner</label><span>{{ meta.examiner }}</span></div>
+    <div class="meta-item"><label>Scan Time</label><span>{{ meta.scan_time }}</span></div>
+    <div class="meta-item"><label>Target</label><span>{{ meta.target }}</span></div>
+    <div class="meta-item"><label>Tool</label><span>{{ meta.tool }}</span></div>
+    <div class="meta-item"><label>Author</label><span>{{ meta.author }}</span></div>
+  </div>
+
+  <!-- INTEGRITY -->
+  <div class="integrity-box">
+    🔒 Evidence Integrity Hash (SHA-256): <strong>{{ meta.integrity_sha256 }}</strong><br>
+    <small>Any modification to the raw scan data after this point will produce a different hash — verifiable chain of custody.</small>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="number">{{ total_hosts }}</div>
+      <div class="label">Hosts Discovered</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">{{ total_ports }}</div>
+      <div class="label">Open Ports Found</div>
+    </div>
+    <div class="stat-card danger">
+      <div class="number">{{ total_flags }}</div>
+      <div class="label">Vulnerability Flags</div>
+    </div>
+  </div>
+
+  <!-- HOST FINDINGS -->
+  <div class="section">
+    <h2>Host Findings</h2>
+
+    {% for ip, data in hosts.items() %}
+    <div class="host-card">
+      <div class="host-header">
+        <span class="ip">{{ ip }}</span>
+        <span class="meta">
+          MAC: {{ data.mac | default('N/A') }}  &nbsp;|&nbsp;
+          OS: {{ data.os | default('Unknown') }}  &nbsp;|&nbsp;
+          {{ data.open_ports | default([]) | length }} open port(s)
+        </span>
+      </div>
+      <div class="host-body">
+
+        {% if data.services %}
+        <table>
+          <thead>
+            <tr><th>Port</th><th>Protocol</th><th>Service</th><th>Product</th><th>Version</th></tr>
+          </thead>
+          <tbody>
+            {% for port, svc in data.services.items() %}
+            <tr>
+              <td>{{ port }}/{{ svc.protocol }}</td>
+              <td>{{ svc.state }}</td>
+              <td>{{ svc.name }}</td>
+              <td>{{ svc.product }}</td>
+              <td>{{ svc.version }} {{ svc.extrainfo }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p style="color:#888;font-size:13px;">No open ports detected.</p>
+        {% endif %}
+
+        {% if data.vuln_flags %}
+        <div class="flag-list">
+          {% for flag in data.vuln_flags %}
+            {% if 'CRITICAL' in flag %}
+              <span class="flag CRITICAL">{{ flag }}</span>
+            {% elif 'HIGH' in flag %}
+              <span class="flag HIGH">{{ flag }}</span>
+            {% elif 'MEDIUM' in flag %}
+              <span class="flag MEDIUM">{{ flag }}</span>
+            {% else %}
+              <span class="flag LOW">{{ flag }}</span>
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- TOPOLOGY -->
+  <div class="topology-section">
+    <h2>Network Topology Map</h2>
+    <iframe src="{{ topology_path }}" frameborder="0"></iframe>
+    <small style="color:#888;font-size:12px;display:block;margin-top:8px;">
+      🔴 Red = Hosts with vulnerability flags &nbsp;|&nbsp; 🟢 Green = Clean hosts &nbsp;|&nbsp; 🔵 Blue = Gateway
+    </small>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    ACROPROBE | Acro Tool Suite | Authorized Use Only
+    <div class="hash">SHA-256 Seal: {{ meta.integrity_sha256 }}</div>
+  </div>
+
+</body>
+</html>
